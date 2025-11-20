@@ -4,6 +4,7 @@ node_modules
 *.tmp
 dist
 build
+.vercel
 .turbo
 .next
 .nuxt
@@ -19,6 +20,7 @@ coverage
 
 # Misc
 *.tsbuildinfo
-package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+.vercel
