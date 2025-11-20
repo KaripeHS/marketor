@@ -1,14 +1,12 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { ContentFormat, ContentState, Platform } from "@prisma/client";
 import { ContentService } from "./content.service";
+import { Auth } from "../auth/auth.decorator";
+import { AuthContext } from "../auth/auth.types";
 
 class CreateContentDto {
-  @IsString()
-  @IsNotEmpty()
-  tenantId!: string;
-
   @IsOptional()
   @IsString()
   campaignId?: string;
@@ -44,16 +42,16 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Get()
-  list(@Query("tenantId") tenantId?: string, @Query("campaignId") campaignId?: string) {
+  list(@Query("tenantId") tenantId?: string, @Query("campaignId") campaignId?: string, @Auth() auth?: AuthContext) {
     const where: Record<string, unknown> = {};
-    if (tenantId) where.tenantId = tenantId;
+    if (tenantId || auth?.tenantId) where.tenantId = tenantId || auth?.tenantId;
     if (campaignId) where.campaignId = campaignId;
     return this.contentService.list(where);
   }
 
   @Post()
-  create(@Body() dto: CreateContentDto) {
-    return this.contentService.create(dto);
+  create(@Body() dto: CreateContentDto, @Auth() auth: AuthContext) {
+    return this.contentService.create({ ...dto, tenantId: auth.tenantId });
   }
 
   @Patch(":id/state")

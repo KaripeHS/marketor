@@ -1,16 +1,14 @@
 import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 import { RevisionStatus } from "@prisma/client";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Auth } from "../auth/auth.decorator";
+import { AuthContext } from "../auth/auth.types";
 import { RevisionsService } from "./revisions.service";
 
 class CreateRevisionDto {
   @IsString()
   @IsNotEmpty()
   contentId!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  requestedBy!: string;
 
   @IsOptional()
   @IsString()
@@ -27,13 +25,13 @@ export class RevisionsController {
   constructor(private readonly revisionsService: RevisionsService) {}
 
   @Get()
-  list() {
-    return this.revisionsService.list();
+  list(@Auth() auth?: AuthContext) {
+    return this.revisionsService.list(auth?.tenantId ? { content: { tenantId: auth.tenantId } } : {});
   }
 
   @Post()
-  create(@Body() dto: CreateRevisionDto) {
-    return this.revisionsService.create(dto);
+  create(@Body() dto: CreateRevisionDto, @Auth() auth: AuthContext) {
+    return this.revisionsService.create({ ...dto, requestedBy: auth.userId });
   }
 
   @Patch(":id/status")
