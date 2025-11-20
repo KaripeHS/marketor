@@ -24,6 +24,8 @@ This repo will hold the GrowthPilot AI platform: a multi-tenant SaaS with an AI 
 ## Deployment (Vercel)
 - Auth verified via CLI (`vercel whoami` should show `karipehs`).
 - Configured with `vercel.json` to build `apps/web` from repo root. Deploy: `vercel --prod` (or `vercel` for preview).
+- Project: `marketer` (linked via `.vercel` in repo root).
+- Set required secrets in Vercel/local: `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, auth keys, Stripe, etc.
 
 ## Next Steps
 - Wire persistence (Postgres/Prisma) and tenants/auth.
@@ -32,4 +34,4 @@ This repo will hold the GrowthPilot AI platform: a multi-tenant SaaS with an AI 
 - Add CI, linting, tests, and monitoring hooks.
 
 ## Live
-- Production (Next.js web shell): https://web-bignon-deguenons-projects.vercel.app
+- Production (Next.js web shell): https://marketer-bignon-deguenons-projects.vercel.app
