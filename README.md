@@ -19,6 +19,7 @@ This repo will hold the GrowthPilot AI platform: a multi-tenant SaaS with an AI 
 - Run API (Nest-style): `npm run api:dev` (listens on `API_PORT` or 4000)
 - Build web: `npm run web:build`
 - Build API: `npm run api:build`
+- Prisma (API): `npm run prisma:generate --workspace apps/api`, `npm run prisma:push --workspace apps/api` (requires `DATABASE_URL`)
 
 ## Deployment (Vercel)
 - Auth verified via CLI (`vercel whoami` should show `karipehs`).

@@ -7,6 +7,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
+    "prisma:generate": "prisma generate --schema prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema prisma/schema.prisma",
     "lint": "echo \"TODO: lint api\"",
     "test": "echo \"TODO: test api\""
   },
@@ -14,11 +16,13 @@
     "@nestjs/common": "^11.1.9",
     "@nestjs/core": "^11.1.9",
     "@nestjs/platform-express": "^11.1.9",
+    "@prisma/client": "^5.18.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "prisma": "^5.18.0",
     "ts-node-dev": "^2.0.0"
   }
 }
