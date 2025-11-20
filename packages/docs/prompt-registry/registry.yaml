@@ -1,0 +1,8 @@
+# Prompt registry placeholder
+# Each entry should be versioned and mapped to agents; expanded in implementation.
+agents:
+  orchestrator:
+    prompts:
+      - id: orchestrator_v0
+        version: 0
+        description: "Placeholder orchestrator prompt."

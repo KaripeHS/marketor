@@ -1,0 +1,16 @@
+{
+  "name": "@growthpilot/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS-style backend for GrowthPilot AI.",
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"TODO: start api (NestJS)\"",
+    "build": "echo \"TODO: build api\"",
+    "start": "echo \"TODO: run compiled api\"",
+    "lint": "echo \"TODO: lint api\"",
+    "test": "echo \"TODO: test api\""
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

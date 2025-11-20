@@ -1,0 +1,15 @@
+{
+  "name": "@growthpilot/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js-style dashboard for GrowthPilot AI.",
+  "scripts": {
+    "dev": "echo \"TODO: start web (Next.js/React)\"",
+    "build": "echo \"TODO: build web\"",
+    "start": "echo \"TODO: run compiled web\"",
+    "lint": "echo \"TODO: lint web\"",
+    "test": "echo \"TODO: test web\""
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

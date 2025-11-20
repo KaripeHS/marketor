@@ -1,0 +1,17 @@
+{
+  "name": "marketor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GrowthPilot AI monorepo (workspace: api, web, shared, docs).",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "echo \"TODO: add lint tooling\"",
+    "test": "echo \"TODO: add tests\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

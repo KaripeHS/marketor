@@ -1,0 +1,15 @@
+ruleset: doctor_general
+description: "Placeholder doctor compliance rule pack. Expand with state-level specifics."
+rules:
+  - id: claims_no_cure
+    severity: high
+    text: "Disallow claims of guaranteed outcomes or cures."
+  - id: before_after_images
+    severity: high
+    text: "Block before/after imagery unless explicitly allowed per jurisdiction."
+  - id: testimonials_restrictions
+    severity: medium
+    text: "Enforce platform and medical board testimonial limitations."
+  - id: disclaimers_required
+    severity: medium
+    text: "Require medical disclaimers on all posts."

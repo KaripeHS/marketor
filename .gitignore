@@ -1,0 +1,24 @@
+# Node
+node_modules
+*.log
+*.tmp
+dist
+build
+.turbo
+.next
+.nuxt
+.DS_Store
+
+# Env
+.env
+.env.*
+
+# Coverage
+coverage
+.nyc_output
+
+# Misc
+*.tsbuildinfo
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
