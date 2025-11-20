@@ -30,3 +30,9 @@ export enum ContentState {
   PUBLISHED = "PUBLISHED",
   REJECTED = "REJECTED"
 }
+
+export enum RevisionStatus {
+  OPEN = "OPEN",
+  RESOLVED = "RESOLVED",
+  REJECTED = "REJECTED"
+}

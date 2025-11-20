@@ -77,6 +77,8 @@ model ContentItem {
   scheduledFor   DateTime?
   publishedAt    DateTime?
   approval       Approval?
+  revisions      RevisionRequest[]
+  comments       Comment[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 }
@@ -125,6 +127,54 @@ enum ApprovalStatus {
   APPROVED
   REJECTED
   CHANGES_REQUESTED
+}
+
+model RevisionRequest {
+  id          String   @id @default(cuid())
+  content     ContentItem @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId   String
+  status      RevisionStatus @default(OPEN)
+  requestedBy String
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum RevisionStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+model Comment {
+  id         String      @id @default(cuid())
+  content    ContentItem @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId  String
+  authorId   String
+  body       String
+  isInternal Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  tenantId   String?
+  action     String
+  targetType String?
+  targetId   String?
+  meta       Json?
+  createdAt  DateTime @default(now())
 }
 
 model PromptVersion {
