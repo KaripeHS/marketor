@@ -10,6 +10,9 @@ import { ApprovalsModule } from "./approvals/approvals.module";
 import { CommentsModule } from "./comments/comments.module";
 import { RevisionsModule } from "./revisions/revisions.module";
 import { NotificationsModule } from "./notifications/notifications.module";
+import { BrandModule } from "./brand/brand.module";
+import { StrategyModule } from "./strategy/strategy.module";
+import { PlansModule } from "./plans/plans.module";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuditInterceptor } from "./audit/audit.interceptor";
@@ -24,7 +27,10 @@ import { AuditInterceptor } from "./audit/audit.interceptor";
     ApprovalsModule,
     CommentsModule,
     RevisionsModule,
-    NotificationsModule
+    NotificationsModule,
+    BrandModule,
+    StrategyModule,
+    PlansModule
   ],
   controllers: [AppController],
   providers: [

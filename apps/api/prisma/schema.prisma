@@ -16,6 +16,10 @@ model Tenant {
   users       UserTenantRole[]
   campaigns   Campaign[]
   content     ContentItem[]
+  brandProfiles BrandProfile[]
+  trendMaps   TrendMap[]
+  strategies  Strategy[]
+  contentPlans ContentPlan[]
 }
 
 model User {
@@ -175,6 +179,70 @@ model AuditLog {
   targetId   String?
   meta       Json?
   createdAt  DateTime @default(now())
+}
+
+model BrandProfile {
+  id          String   @id @default(cuid())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId    String
+  name        String
+  voice       Json
+  audiences   Json
+  valueProps  Json
+  visualStyle Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, name])
+}
+
+model TrendMap {
+  id         String   @id @default(cuid())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId   String
+  generatedAt DateTime @default(now())
+  data       Json
+  createdAt  DateTime @default(now())
+}
+
+model Strategy {
+  id         String   @id @default(cuid())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId   String
+  name       String
+  startsOn   DateTime
+  endsOn     DateTime
+  goals      Json
+  pillars    Json
+  platformFocus Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  plans      ContentPlan[]
+}
+
+model ContentPlan {
+  id         String    @id @default(cuid())
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId   String
+  strategy   Strategy? @relation(fields: [strategyId], references: [id], onDelete: SetNull)
+  strategyId String?
+  timeWindow Json
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  items      ContentPlanItem[]
+}
+
+model ContentPlanItem {
+  id          String      @id @default(cuid())
+  plan        ContentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId      String
+  contentId   String?
+  platform    Platform
+  format      ContentFormat
+  scheduledAt DateTime
+  topicSlug   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model PromptVersion {
