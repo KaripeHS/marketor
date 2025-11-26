@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 import { TenantsService } from "./tenants.service";
 import { Roles } from "../auth/roles.decorator";
@@ -19,6 +20,8 @@ class UpdateTenantDto {
   name?: string;
 }
 
+@ApiTags("tenants")
+@ApiBearerAuth()
 @Controller("tenants")
 export class TenantsController {
   constructor(private readonly tenantsService: TenantsService) { }

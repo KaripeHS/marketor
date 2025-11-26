@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Delete, Query } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsBoolean, IsDate, IsEnum, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { ContentFormat, ContentState, Platform } from "@prisma/client";
@@ -70,6 +71,8 @@ class UpdateContentDto {
   scheduledFor?: Date | null;
 }
 
+@ApiTags("content")
+@ApiBearerAuth()
 @Controller("content")
 export class ContentController {
   constructor(

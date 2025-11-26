@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min } from "class-validator";
 import { NotificationChannel, NotificationType } from "@prisma/client";
 import { Transform } from "class-transformer";
@@ -70,6 +71,8 @@ class RegisterPushTokenDto {
     deviceName?: string;
 }
 
+@ApiTags("notifications")
+@ApiBearerAuth()
 @Controller("notifications")
 export class NotificationsController {
     constructor(

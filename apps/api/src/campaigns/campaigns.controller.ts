@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Delete, Query } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { CampaignStatus } from "@prisma/client";
 import { CampaignsService } from "./campaigns.service";
@@ -27,6 +28,8 @@ class UpdateCampaignDto {
   status?: CampaignStatus;
 }
 
+@ApiTags("campaigns")
+@ApiBearerAuth()
 @Controller("campaigns")
 export class CampaignsController {
   constructor(private readonly campaignsService: CampaignsService) { }

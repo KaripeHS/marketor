@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsArray, IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { Platform, PostJobStatus } from "@prisma/client";
@@ -54,6 +55,8 @@ class CreatePostJobDto {
     scheduledFor!: Date;
 }
 
+@ApiTags("social")
+@ApiBearerAuth()
 @Controller("social")
 export class SocialController {
     constructor(

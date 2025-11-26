@@ -4,6 +4,7 @@ initSentry();
 
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
@@ -12,6 +13,31 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
     rawBody: true, // Required for Stripe webhooks
+  });
+
+  // Swagger/OpenAPI documentation
+  const config = new DocumentBuilder()
+    .setTitle("GrowthPilot API")
+    .setDescription("Social media content management and publishing platform API")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .addApiKey({ type: "apiKey", name: "x-tenant-id", in: "header" }, "tenant-id")
+    .addTag("auth", "Authentication endpoints")
+    .addTag("tenants", "Tenant/organization management")
+    .addTag("users", "User management")
+    .addTag("campaigns", "Campaign management")
+    .addTag("content", "Content creation and management")
+    .addTag("approvals", "Content approval workflow")
+    .addTag("social", "Social media connections and publishing")
+    .addTag("analytics", "Content performance analytics")
+    .addTag("notifications", "User notifications")
+    .addTag("billing", "Subscription and billing")
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
   });
 
   // Security headers

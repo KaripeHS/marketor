@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, RawBodyRequest, Req, Res } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsOptional, IsString, IsNumber, Min } from "class-validator";
 import { Request, Response } from "express";
 import { Auth } from "../auth/auth.decorator";
@@ -28,6 +29,8 @@ class CreatePortalDto {
     returnUrl!: string;
 }
 
+@ApiTags("billing")
+@ApiBearerAuth()
 @Controller("billing")
 export class BillingController {
     constructor(

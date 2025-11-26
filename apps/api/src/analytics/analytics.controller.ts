@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { Platform } from "@prisma/client";
@@ -79,6 +80,8 @@ class BatchIngestDto {
     metrics!: IngestMetricsDto[];
 }
 
+@ApiTags("analytics")
+@ApiBearerAuth()
 @Controller("analytics")
 export class AnalyticsController {
     constructor(
