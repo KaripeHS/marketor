@@ -1,26 +1,45 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class TenantsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: CacheService
+  ) { }
 
-  list() {
-    return this.prisma.tenant.findMany({ orderBy: { createdAt: "desc" } });
+  async list() {
+    return this.cache.getOrSet(
+      this.cache.keys.tenantList(),
+      () => this.prisma.tenant.findMany({ orderBy: { createdAt: "desc" } }),
+      { ttl: this.cache.ttl.medium }
+    );
   }
 
-  findById(id: string) {
-    return this.prisma.tenant.findUnique({ where: { id } });
+  async findById(id: string) {
+    return this.cache.getOrSet(
+      this.cache.keys.tenant(id),
+      () => this.prisma.tenant.findUnique({ where: { id } }),
+      { ttl: this.cache.ttl.medium }
+    );
   }
 
-  create(name: string, slug: string) {
-    return this.prisma.tenant.create({ data: { name, slug } });
+  async create(name: string, slug: string) {
+    const tenant = await this.prisma.tenant.create({ data: { name, slug } });
+    await this.cache.del(this.cache.keys.tenantList());
+    return tenant;
   }
 
-  update(id: string, data: { name?: string }) {
-    return this.prisma.tenant.update({
+  async update(id: string, data: { name?: string }) {
+    const tenant = await this.prisma.tenant.update({
       where: { id },
       data
     });
+    await Promise.all([
+      this.cache.del(this.cache.keys.tenant(id)),
+      this.cache.del(this.cache.keys.tenantList())
+    ]);
+    return tenant;
   }
 }

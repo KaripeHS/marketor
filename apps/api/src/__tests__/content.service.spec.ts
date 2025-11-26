@@ -1,10 +1,12 @@
 import { ContentService } from '../content/content.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../cache/cache.service';
 import { ContentFormat, ContentState, Platform } from '@prisma/client';
 
 describe('ContentService', () => {
     let service: ContentService;
     let prismaService: jest.Mocked<PrismaService>;
+    let cacheService: jest.Mocked<CacheService>;
 
     const mockContentItem = {
         id: 'content-1',
@@ -33,7 +35,24 @@ describe('ContentService', () => {
             },
         } as unknown as jest.Mocked<PrismaService>;
 
-        service = new ContentService(prismaService);
+        // Mock CacheService - bypass caching by always calling the factory
+        cacheService = {
+            get: jest.fn().mockResolvedValue(undefined),
+            set: jest.fn().mockResolvedValue(undefined),
+            del: jest.fn().mockResolvedValue(undefined),
+            getOrSet: jest.fn().mockImplementation(async (_key, factory) => factory()),
+            keys: {
+                content: (id: string) => `content:${id}`,
+                contentByTenant: (tenantId: string) => `content:tenant:${tenantId}`,
+                contentByCampaign: (campaignId: string) => `content:campaign:${campaignId}`,
+            },
+            ttl: {
+                short: 30000,
+                medium: 300000,
+            },
+        } as unknown as jest.Mocked<CacheService>;
+
+        service = new ContentService(prismaService, cacheService);
     });
 
     describe('list', () => {
