@@ -8,6 +8,7 @@ import { Roles } from "../auth/roles.decorator";
 import { MetricsIngestionService, MetricsData } from "./metrics-ingestion.service";
 import { AnalyticsAggregationService } from "./analytics-aggregation.service";
 import { LearningInsightsService } from "./learning-insights.service";
+import { MetricsFetcherService } from "./fetchers";
 
 class IngestMetricsDto {
     @IsString()
@@ -83,7 +84,8 @@ export class AnalyticsController {
     constructor(
         private readonly ingestion: MetricsIngestionService,
         private readonly aggregation: AnalyticsAggregationService,
-        private readonly learning: LearningInsightsService
+        private readonly learning: LearningInsightsService,
+        private readonly fetcher: MetricsFetcherService
     ) {}
 
     // Dashboard endpoints
@@ -236,12 +238,28 @@ export class AnalyticsController {
         @Query("platformPostId") platformPostId: string,
         @Auth() auth: AuthContext
     ) {
-        return this.ingestion.fetchMetricsFromPlatform(
+        // Use real platform fetcher instead of mock
+        return this.fetcher.fetchAndIngestMetrics(
             auth.tenantId,
             contentId,
             platform,
             platformPostId
         );
+    }
+
+    @Post("fetch-content/:contentId")
+    @Roles("ADMIN", "AGENCY")
+    async fetchAllPlatformsForContent(
+        @Param("contentId") contentId: string,
+        @Auth() auth: AuthContext
+    ) {
+        return this.fetcher.fetchMetricsForContent(auth.tenantId, contentId);
+    }
+
+    @Post("fetch-all")
+    @Roles("ADMIN")
+    async fetchAllPublishedMetrics(@Auth() auth: AuthContext) {
+        return this.fetcher.fetchAllPublishedContent(auth.tenantId);
     }
 
     // Learning insights endpoints
