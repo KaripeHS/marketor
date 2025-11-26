@@ -120,7 +120,7 @@ describe("RateLimitService", () => {
         it("should return status for all platforms", () => {
             const statuses = service.getAllStatus(testTenantId);
 
-            expect(statuses.length).toBe(5); // 5 platforms
+            expect(statuses.length).toBe(8); // 8 platforms
 
             const platforms = statuses.map(s => s.platform);
             expect(platforms).toContain(Platform.TIKTOK);
@@ -128,6 +128,9 @@ describe("RateLimitService", () => {
             expect(platforms).toContain(Platform.YOUTUBE);
             expect(platforms).toContain(Platform.YOUTUBE_SHORT);
             expect(platforms).toContain(Platform.FACEBOOK);
+            expect(platforms).toContain(Platform.TWITTER);
+            expect(platforms).toContain(Platform.LINKEDIN);
+            expect(platforms).toContain(Platform.PINTEREST);
         });
     });
 
@@ -153,12 +156,15 @@ describe("RateLimitService", () => {
         it("should return configs for all platforms", () => {
             const configs = service.getAllConfigs();
 
-            expect(Object.keys(configs).length).toBe(5);
+            expect(Object.keys(configs).length).toBe(8);
             expect(configs.TIKTOK).toBeDefined();
             expect(configs.INSTAGRAM).toBeDefined();
             expect(configs.YOUTUBE).toBeDefined();
             expect(configs.YOUTUBE_SHORT).toBeDefined();
             expect(configs.FACEBOOK).toBeDefined();
+            expect(configs.TWITTER).toBeDefined();
+            expect(configs.LINKEDIN).toBeDefined();
+            expect(configs.PINTEREST).toBeDefined();
         });
     });
 

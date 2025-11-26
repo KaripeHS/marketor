@@ -137,7 +137,7 @@ export class OAuthController {
 
     private normalizePlatform(platform: string): Platform {
         const normalized = platform.toUpperCase().replace("-", "_") as Platform;
-        const validPlatforms: Platform[] = ["TIKTOK", "INSTAGRAM", "YOUTUBE", "YOUTUBE_SHORT", "FACEBOOK"];
+        const validPlatforms: Platform[] = ["TIKTOK", "INSTAGRAM", "YOUTUBE", "YOUTUBE_SHORT", "FACEBOOK", "TWITTER", "LINKEDIN", "PINTEREST"];
 
         if (!validPlatforms.includes(normalized)) {
             throw new BadRequestException(`Invalid platform: ${platform}`);
@@ -153,6 +153,9 @@ export class OAuthController {
             YOUTUBE: "YouTube",
             YOUTUBE_SHORT: "YouTube Shorts",
             FACEBOOK: "Facebook",
+            TWITTER: "Twitter / X",
+            LINKEDIN: "LinkedIn",
+            PINTEREST: "Pinterest",
         };
         return names[platform];
     }

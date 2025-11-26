@@ -3,6 +3,9 @@ import { TikTokPublisher } from "./tiktok.publisher";
 import { InstagramPublisher } from "./instagram.publisher";
 import { YouTubePublisher, YouTubeShortPublisher } from "./youtube.publisher";
 import { FacebookPublisher } from "./facebook.publisher";
+import { TwitterPublisher } from "./twitter.publisher";
+import { LinkedInPublisher } from "./linkedin.publisher";
+import { PinterestPublisher } from "./pinterest.publisher";
 import { Platform } from "@prisma/client";
 import { PublishContent } from "./publisher.interface";
 
@@ -13,6 +16,9 @@ describe("PublisherService", () => {
     let youtubePublisher: YouTubePublisher;
     let youtubeShortPublisher: YouTubeShortPublisher;
     let facebookPublisher: FacebookPublisher;
+    let twitterPublisher: TwitterPublisher;
+    let linkedinPublisher: LinkedInPublisher;
+    let pinterestPublisher: PinterestPublisher;
 
     beforeEach(() => {
         tiktokPublisher = new TikTokPublisher();
@@ -20,25 +26,34 @@ describe("PublisherService", () => {
         youtubePublisher = new YouTubePublisher();
         youtubeShortPublisher = new YouTubeShortPublisher();
         facebookPublisher = new FacebookPublisher();
+        twitterPublisher = new TwitterPublisher();
+        linkedinPublisher = new LinkedInPublisher();
+        pinterestPublisher = new PinterestPublisher();
 
         service = new PublisherService(
             tiktokPublisher,
             instagramPublisher,
             youtubePublisher,
             youtubeShortPublisher,
-            facebookPublisher
+            facebookPublisher,
+            twitterPublisher,
+            linkedinPublisher,
+            pinterestPublisher
         );
     });
 
     describe("getSupportedPlatforms", () => {
-        it("should return all 5 platforms", () => {
+        it("should return all 8 platforms", () => {
             const platforms = service.getSupportedPlatforms();
-            expect(platforms).toHaveLength(5);
+            expect(platforms).toHaveLength(8);
             expect(platforms).toContain(Platform.TIKTOK);
             expect(platforms).toContain(Platform.INSTAGRAM);
             expect(platforms).toContain(Platform.YOUTUBE);
             expect(platforms).toContain(Platform.YOUTUBE_SHORT);
             expect(platforms).toContain(Platform.FACEBOOK);
+            expect(platforms).toContain(Platform.TWITTER);
+            expect(platforms).toContain(Platform.LINKEDIN);
+            expect(platforms).toContain(Platform.PINTEREST);
         });
     });
 
@@ -49,6 +64,9 @@ describe("PublisherService", () => {
             expect(service.isSupported(Platform.YOUTUBE)).toBe(true);
             expect(service.isSupported(Platform.YOUTUBE_SHORT)).toBe(true);
             expect(service.isSupported(Platform.FACEBOOK)).toBe(true);
+            expect(service.isSupported(Platform.TWITTER)).toBe(true);
+            expect(service.isSupported(Platform.LINKEDIN)).toBe(true);
+            expect(service.isSupported(Platform.PINTEREST)).toBe(true);
         });
     });
 

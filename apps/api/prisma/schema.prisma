@@ -108,6 +108,9 @@ enum Platform {
   YOUTUBE
   YOUTUBE_SHORT
   FACEBOOK
+  TWITTER
+  LINKEDIN
+  PINTEREST
 }
 
 enum ContentFormat {

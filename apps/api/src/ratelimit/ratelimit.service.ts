@@ -62,6 +62,24 @@ export class RateLimitService implements OnModuleInit {
             dailyLimit: 4800,        // ~200 calls per hour * 24 hours
             description: "Facebook Graph API",
         },
+        TWITTER: {
+            maxRequests: 200,        // Twitter API v2
+            windowMs: 15 * 60 * 1000, // 15 minute window
+            dailyLimit: 2400,        // 200 tweets per 15 min, app-level
+            description: "Twitter API v2",
+        },
+        LINKEDIN: {
+            maxRequests: 100,        // LinkedIn Marketing API
+            windowMs: 60 * 60 * 1000, // 1 hour window
+            dailyLimit: 800,
+            description: "LinkedIn Marketing API",
+        },
+        PINTEREST: {
+            maxRequests: 1000,       // Pinterest API
+            windowMs: 60 * 60 * 1000, // 1 hour window
+            dailyLimit: 10000,
+            description: "Pinterest API",
+        },
     };
 
     onModuleInit() {

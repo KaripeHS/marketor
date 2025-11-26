@@ -175,6 +175,9 @@ export class MetricsIngestionService {
             YOUTUBE: 0.8,     // Lower engagement rate but higher watch time
             YOUTUBE_SHORT: 1.3, // Shorts have higher engagement
             FACEBOOK: 0.9,    // Moderate engagement
+            TWITTER: 0.7,     // Lower engagement on X/Twitter
+            LINKEDIN: 1.0,    // Professional engagement
+            PINTEREST: 1.1,   // Good engagement for visual content
         };
         return multipliers[platform] || 1.0;
     }

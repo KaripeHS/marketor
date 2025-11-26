@@ -10,6 +10,9 @@ import { TikTokPublisher } from "./tiktok.publisher";
 import { InstagramPublisher } from "./instagram.publisher";
 import { YouTubePublisher, YouTubeShortPublisher } from "./youtube.publisher";
 import { FacebookPublisher } from "./facebook.publisher";
+import { TwitterPublisher } from "./twitter.publisher";
+import { LinkedInPublisher } from "./linkedin.publisher";
+import { PinterestPublisher } from "./pinterest.publisher";
 
 @Injectable()
 export class PublisherService {
@@ -21,7 +24,10 @@ export class PublisherService {
         instagramPublisher: InstagramPublisher,
         youtubePublisher: YouTubePublisher,
         youtubeShortPublisher: YouTubeShortPublisher,
-        facebookPublisher: FacebookPublisher
+        facebookPublisher: FacebookPublisher,
+        twitterPublisher: TwitterPublisher,
+        linkedinPublisher: LinkedInPublisher,
+        pinterestPublisher: PinterestPublisher
     ) {
         this.publishers = new Map<Platform, PlatformPublisher>();
         this.publishers.set(Platform.TIKTOK, tiktokPublisher);
@@ -29,6 +35,9 @@ export class PublisherService {
         this.publishers.set(Platform.YOUTUBE, youtubePublisher);
         this.publishers.set(Platform.YOUTUBE_SHORT, youtubeShortPublisher);
         this.publishers.set(Platform.FACEBOOK, facebookPublisher);
+        this.publishers.set(Platform.TWITTER, twitterPublisher);
+        this.publishers.set(Platform.LINKEDIN, linkedinPublisher);
+        this.publishers.set(Platform.PINTEREST, pinterestPublisher);
     }
 
     getPublisher(platform: Platform): PlatformPublisher | undefined {

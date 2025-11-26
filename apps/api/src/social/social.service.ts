@@ -304,6 +304,9 @@ export class SocialService {
             YOUTUBE: `yt_${Date.now()}`,
             YOUTUBE_SHORT: `yts_${Date.now()}`,
             FACEBOOK: `fb_${Date.now()}`,
+            TWITTER: `tw_${Date.now()}`,
+            LINKEDIN: `li_${Date.now()}`,
+            PINTEREST: `pin_${Date.now()}`,
         };
 
         const mockUrls: Record<Platform, string> = {
@@ -312,6 +315,9 @@ export class SocialService {
             YOUTUBE: `https://youtube.com/watch?v=${mockIds.YOUTUBE}`,
             YOUTUBE_SHORT: `https://youtube.com/shorts/${mockIds.YOUTUBE_SHORT}`,
             FACEBOOK: `https://facebook.com/posts/${mockIds.FACEBOOK}`,
+            TWITTER: `https://twitter.com/i/status/${mockIds.TWITTER}`,
+            LINKEDIN: `https://linkedin.com/feed/update/${mockIds.LINKEDIN}`,
+            PINTEREST: `https://pinterest.com/pin/${mockIds.PINTEREST}`,
         };
 
         return {
