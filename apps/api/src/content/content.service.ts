@@ -4,12 +4,29 @@ import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class ContentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   list(where: Prisma.ContentItemWhereInput = {}) {
     return this.prisma.contentItem.findMany({
       where,
+      include: { campaign: true },
       orderBy: { createdAt: "desc" }
+    });
+  }
+
+  findById(id: string) {
+    return this.prisma.contentItem.findUnique({
+      where: { id },
+      include: {
+        campaign: true,
+        approval: true,
+        comments: {
+          orderBy: { createdAt: "desc" }
+        },
+        revisions: {
+          orderBy: { createdAt: "desc" }
+        }
+      }
     });
   }
 
@@ -37,6 +54,19 @@ export class ContentService {
     return this.prisma.contentItem.update({
       where: { id },
       data: { state, scheduledFor: scheduledFor ?? null }
+    });
+  }
+
+  async update(id: string, data: Prisma.ContentItemUpdateInput) {
+    return this.prisma.contentItem.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string) {
+    return this.prisma.contentItem.delete({
+      where: { id },
     });
   }
 }

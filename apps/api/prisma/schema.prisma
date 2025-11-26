@@ -20,16 +20,25 @@ model Tenant {
   trendMaps   TrendMap[]
   strategies  Strategy[]
   contentPlans ContentPlan[]
+  socialConnections SocialConnection[]
+  postJobs    PostJob[]
+  invitations Invitation[]
+  mediaAssets MediaAsset[]
+  contentMetrics ContentMetrics[]
+  dailyAnalytics DailyAnalytics[]
+  learningInsights LearningInsight[]
+  subscription Subscription?
 }
 
 model User {
-  id          String            @id @default(cuid())
-  email       String            @unique
-  name        String?
-  authProvider String           @default("clerk")
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  memberships UserTenantRole[]
+  id           String            @id @default(cuid())
+  email        String            @unique
+  name         String?
+  passwordHash String?
+  authProvider String            @default("local")
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  memberships  UserTenantRole[]
 }
 
 model UserTenantRole {
@@ -78,6 +87,12 @@ model ContentItem {
   platform       Platform
   format         ContentFormat
   state          ContentState      @default(DRAFT)
+  title          String?
+  script         String?           @db.Text
+  caption        String?           @db.Text
+  hashtags       String[]
+  mediaUrl       String?
+  thumbnailUrl   String?
   scheduledFor   DateTime?
   publishedAt    DateTime?
   approval       Approval?
@@ -162,12 +177,102 @@ model Comment {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  type      String
-  payload   Json
+  tenantId  String?
+  type      NotificationType
+  channel   NotificationChannel @default(IN_APP)
+  title     String
+  body      String             @db.Text
+  payload   Json?
   readAt    DateTime?
-  createdAt DateTime @default(now())
+  sentAt    DateTime?
+  deliveredAt DateTime?
+  failedAt  DateTime?
+  error     String?
+  createdAt DateTime           @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([type])
+  @@index([readAt])
+}
+
+model NotificationPreference {
+  id          String   @id @default(cuid())
+  userId      String
+  tenantId    String?
+
+  // Channel preferences
+  emailEnabled    Boolean @default(true)
+  pushEnabled     Boolean @default(true)
+  inAppEnabled    Boolean @default(true)
+
+  // Notification type preferences
+  approvalRequests    Boolean @default(true)
+  approvalDecisions   Boolean @default(true)
+  revisionRequests    Boolean @default(true)
+  comments            Boolean @default(true)
+  mentions            Boolean @default(true)
+  scheduleReminders   Boolean @default(true)
+  publishSuccess      Boolean @default(true)
+  publishFailure      Boolean @default(true)
+  tokenExpiry         Boolean @default(true)
+  weeklyDigest        Boolean @default(true)
+  analyticsAlerts     Boolean @default(true)
+
+  // Timing preferences
+  quietHoursStart     Int?     // Hour of day (0-23)
+  quietHoursEnd       Int?     // Hour of day (0-23)
+  timezone            String   @default("UTC")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, tenantId])
+  @@index([userId])
+}
+
+model NotificationTemplate {
+  id          String              @id @default(cuid())
+  type        NotificationType
+  channel     NotificationChannel
+  name        String
+  subject     String?             // For email
+  body        String              @db.Text
+  variables   String[]            // Available template variables
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([type, channel])
+}
+
+enum NotificationType {
+  APPROVAL_REQUESTED
+  APPROVAL_APPROVED
+  APPROVAL_REJECTED
+  APPROVAL_CHANGES_REQUESTED
+  REVISION_REQUESTED
+  REVISION_RESOLVED
+  COMMENT_ADDED
+  MENTION
+  SCHEDULE_REMINDER
+  PUBLISH_SUCCESS
+  PUBLISH_FAILURE
+  TOKEN_EXPIRY_WARNING
+  TOKEN_EXPIRED
+  WEEKLY_DIGEST
+  ANALYTICS_ALERT
+  INVITATION_RECEIVED
+  MEMBER_JOINED
+  SYSTEM_ANNOUNCEMENT
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
 }
 
 model AuditLog {
@@ -257,6 +362,66 @@ model PromptVersion {
   @@unique([agent, version])
 }
 
+// Social Integration Models
+
+model SocialConnection {
+  id            String   @id @default(cuid())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+  platform      Platform
+  accountId     String
+  accountName   String?
+  accessToken   String   @db.Text
+  refreshToken  String?  @db.Text
+  tokenExpiry   DateTime?
+  scopes        String[]
+  isActive      Boolean  @default(true)
+  lastSyncAt    DateTime?
+  meta          Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tenantId, platform, accountId])
+}
+
+model PostJob {
+  id            String     @id @default(cuid())
+  tenant        Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+  contentId     String
+  platform      Platform
+  status        PostJobStatus @default(PENDING)
+  scheduledFor  DateTime
+  attempts      Int        @default(0)
+  maxAttempts   Int        @default(3)
+  lastError     String?    @db.Text
+  publishResult PublishResult?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status, scheduledFor])
+}
+
+enum PostJobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model PublishResult {
+  id              String   @id @default(cuid())
+  postJob         PostJob  @relation(fields: [postJobId], references: [id], onDelete: Cascade)
+  postJobId       String   @unique
+  platform        Platform
+  platformPostId  String?
+  platformUrl     String?
+  publishedAt     DateTime
+  meta            Json?
+  createdAt       DateTime @default(now())
+}
+
 model ComplianceRule {
   id          String   @id @default(cuid())
   ruleset     String
@@ -267,4 +432,350 @@ model ComplianceRule {
   updatedAt   DateTime @updatedAt
 
   @@unique([ruleset, ruleId])
+}
+
+// Invitation Model
+
+model Invitation {
+  id          String           @id @default(cuid())
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId    String
+  email       String
+  role        Role             @default(CLIENT)
+  token       String           @unique
+  status      InvitationStatus @default(PENDING)
+  invitedBy   String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([tenantId, email])
+  @@index([token])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+// Media Asset Model
+
+model MediaAsset {
+  id               String       @id @default(cuid())
+  tenant           Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId         String
+  contentId        String?
+  filename         String
+  originalFilename String
+  mimeType         String
+  size             Int
+  url              String
+  storageKey       String
+  type             String       // image, video, thumbnail
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([tenantId])
+  @@index([contentId])
+}
+
+// Analytics Models
+
+model ContentMetrics {
+  id              String       @id @default(cuid())
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String
+  contentId       String
+  platform        Platform
+  platformPostId  String?      // ID from the platform
+
+  // Core metrics
+  views           Int          @default(0)
+  likes           Int          @default(0)
+  comments        Int          @default(0)
+  shares          Int          @default(0)
+  saves           Int          @default(0)
+
+  // Engagement metrics
+  engagementRate  Float?       // (likes + comments + shares + saves) / views * 100
+  clickRate       Float?       // clicks / impressions * 100
+
+  // Video-specific metrics
+  watchTime       Int?         // Total watch time in seconds
+  avgWatchTime    Float?       // Average watch time per view
+  completionRate  Float?       // % who watched to end
+
+  // Reach metrics
+  reach           Int?         // Unique accounts reached
+  impressions     Int?         // Total times shown
+
+  // Follower impact
+  followsGained   Int?         // New followers from this content
+  profileVisits   Int?         // Profile visits from this content
+
+  // Timing
+  fetchedAt       DateTime     @default(now())
+  metricsDate     DateTime     // The date these metrics represent
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([contentId, platform, metricsDate])
+  @@index([tenantId])
+  @@index([contentId])
+  @@index([platform])
+  @@index([metricsDate])
+}
+
+model DailyAnalytics {
+  id              String       @id @default(cuid())
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String
+  platform        Platform
+  date            DateTime     @db.Date
+
+  // Aggregated metrics
+  totalViews      Int          @default(0)
+  totalLikes      Int          @default(0)
+  totalComments   Int          @default(0)
+  totalShares     Int          @default(0)
+  totalSaves      Int          @default(0)
+
+  // Averages
+  avgEngagementRate Float?
+  avgCompletionRate Float?
+
+  // Counts
+  postsPublished  Int          @default(0)
+  topPostId       String?      // Best performing post of the day
+
+  // Follower metrics
+  followersGained Int          @default(0)
+  followersLost   Int          @default(0)
+  netFollowers    Int          @default(0)
+  totalFollowers  Int?         // Snapshot of total followers
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([tenantId, platform, date])
+  @@index([tenantId])
+  @@index([platform])
+  @@index([date])
+}
+
+model LearningInsight {
+  id              String       @id @default(cuid())
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String
+
+  // Insight details
+  type            InsightType
+  category        String       // timing, format, topic, hashtag, length, etc.
+  insight         String       @db.Text
+  confidence      Float        // 0-1 confidence score
+  recommendation  String?      @db.Text
+
+  // Data backing
+  sampleSize      Int          // Number of posts analyzed
+  dateRange       Json         // { start: Date, end: Date }
+  platforms       Platform[]
+
+  // Status
+  isActive        Boolean      @default(true)
+  appliedCount    Int          @default(0) // Times this insight was used
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([isActive])
+}
+
+enum InsightType {
+  TIMING           // Best posting times
+  FORMAT           // Best content formats
+  TOPIC            // Best performing topics
+  HASHTAG          // Effective hashtags
+  LENGTH           // Optimal content length
+  HOOK             // Effective hooks/openers
+  CTA              // Effective calls to action
+  AUDIENCE         // Audience preferences
+  TREND            // Trending pattern
+}
+
+// Billing Models
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  tenant              Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId            String             @unique
+
+  // Stripe IDs
+  stripeCustomerId    String             @unique
+  stripeSubscriptionId String?           @unique
+  stripePriceId       String?
+
+  // Plan details
+  plan                PlanType           @default(FREE)
+  status              SubscriptionStatus @default(TRIALING)
+
+  // Billing period
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+  canceledAt          DateTime?
+
+  // Trial
+  trialStart          DateTime?
+  trialEnd            DateTime?
+
+  // Limits (can override plan defaults)
+  maxUsers            Int?
+  maxPosts            Int?
+  maxStorage          Int?               // in MB
+  maxPlatforms        Int?
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  usageRecords        UsageRecord[]
+  invoices            Invoice[]
+
+  @@index([stripeCustomerId])
+  @@index([status])
+}
+
+model UsageRecord {
+  id              String       @id @default(cuid())
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId  String
+  tenantId        String
+
+  // Usage type
+  type            UsageType
+
+  // Period
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Counts
+  quantity        Int          @default(0)
+
+  // Stripe metering
+  stripeUsageRecordId String?
+  reportedAt      DateTime?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([subscriptionId, type, periodStart])
+  @@index([tenantId])
+  @@index([type])
+  @@index([periodStart])
+}
+
+model Invoice {
+  id                  String        @id @default(cuid())
+  subscription        Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId      String
+  tenantId            String
+
+  // Stripe IDs
+  stripeInvoiceId     String        @unique
+  stripePaymentIntentId String?
+
+  // Amount
+  amountDue           Int           // in cents
+  amountPaid          Int           @default(0)
+  currency            String        @default("usd")
+
+  // Status
+  status              InvoiceStatus @default(DRAFT)
+
+  // Dates
+  dueDate             DateTime?
+  paidAt              DateTime?
+
+  // PDF
+  invoicePdf          String?
+  hostedInvoiceUrl    String?
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+}
+
+model PlanDefinition {
+  id              String      @id @default(cuid())
+
+  // Plan info
+  plan            PlanType    @unique
+  name            String
+  description     String?
+
+  // Stripe
+  stripePriceId   String?     @unique
+  stripeProductId String?
+
+  // Pricing
+  priceMonthly    Int         @default(0)  // in cents
+  priceYearly     Int         @default(0)  // in cents
+
+  // Limits
+  maxUsers        Int         @default(1)
+  maxPosts        Int         @default(10)
+  maxStorage      Int         @default(100)  // in MB
+  maxPlatforms    Int         @default(1)
+
+  // Features
+  features        String[]
+
+  // Status
+  isActive        Boolean     @default(true)
+  isPublic        Boolean     @default(true)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+enum PlanType {
+  FREE
+  STARTER
+  PROFESSIONAL
+  AGENCY
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAUSED
+}
+
+enum UsageType {
+  POSTS_PUBLISHED
+  STORAGE_MB
+  AI_GENERATIONS
+  TEAM_MEMBERS
+  PLATFORMS_CONNECTED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
 }

@@ -12,14 +12,18 @@
     "web:build": "npm run build --workspace apps/web",
     "api:dev": "npm run dev --workspace apps/api",
     "api:build": "npm run build --workspace apps/api",
-    "lint": "echo \"TODO: add lint tooling\"",
-    "test": "echo \"TODO: add tests\""
+    "lint": "eslint apps/api/src apps/web/app apps/web/components apps/web/contexts apps/web/lib apps/web/services apps/web/types",
+    "lint:fix": "eslint --fix apps/api/src apps/web/app apps/web/components apps/web/contexts apps/web/lib apps/web/services apps/web/types",
+    "test": "npm run test --workspace apps/api"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
-    "typescript": "^5.9.3"
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0"
   }
 }

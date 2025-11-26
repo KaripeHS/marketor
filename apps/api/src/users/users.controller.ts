@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Role } from "@prisma/client";
 import { UsersService } from "./users.service";
+import { Roles } from "../auth/roles.decorator";
 
 class CreateUserDto {
   @IsEmail()
@@ -34,16 +35,24 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @Roles("ADMIN", "AGENCY")
   list() {
     return this.usersService.list();
   }
 
+  @Get(":id")
+  getById(@Param("id") id: string) {
+    return this.usersService.findById(id);
+  }
+
   @Post()
+  @Roles("ADMIN")
   create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
   @Post("membership")
+  @Roles("ADMIN")
   addMembership(@Body() dto: CreateMembershipDto) {
     return this.usersService.addMembership(dto);
   }

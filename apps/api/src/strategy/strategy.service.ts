@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class StrategyService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   list(where: Prisma.StrategyWhereInput = {}) {
     return this.prisma.strategy.findMany({
@@ -24,6 +24,19 @@ export class StrategyService {
         pillars: data.pillars,
         platformFocus: data.platformFocus
       }
+    });
+  }
+
+  async update(id: string, data: Prisma.StrategyUpdateInput) {
+    return this.prisma.strategy.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string) {
+    return this.prisma.strategy.delete({
+      where: { id },
     });
   }
 }

@@ -18,6 +18,17 @@ export class UsersService {
     });
   }
 
+  findById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        memberships: {
+          include: { tenant: true }
+        }
+      }
+    });
+  }
+
   create(data: { email: string; name?: string | null; authProvider?: string }) {
     return this.prisma.user.create({
       data: {

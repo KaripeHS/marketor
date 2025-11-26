@@ -4,6 +4,7 @@ import { IsNotEmpty, IsObject, IsString } from "class-validator";
 import { BrandService } from "./brand.service";
 import { Auth } from "../auth/auth.decorator";
 import { AuthContext } from "../auth/auth.types";
+import { Roles } from "../auth/roles.decorator";
 
 class UpsertBrandDto {
   @IsString()
@@ -33,6 +34,7 @@ export class BrandController {
   }
 
   @Post()
+  @Roles("ADMIN", "AGENCY")
   upsert(@Body() dto: UpsertBrandDto, @Auth() auth: AuthContext) {
     return this.brandService.upsert(auth.tenantId, dto.name, {
       voice: dto.voice as unknown as Prisma.InputJsonValue,

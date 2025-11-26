@@ -36,3 +36,6 @@ export enum RevisionStatus {
   RESOLVED = "RESOLVED",
   REJECTED = "REJECTED"
 }
+
+// Agent types and schemas
+export * from "./agents";

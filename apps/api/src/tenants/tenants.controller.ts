@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { IsNotEmpty, IsString, Matches } from "class-validator";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
+import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 import { TenantsService } from "./tenants.service";
+import { Roles } from "../auth/roles.decorator";
 
 class CreateTenantDto {
   @IsString()
@@ -12,17 +13,35 @@ class CreateTenantDto {
   slug!: string;
 }
 
+class UpdateTenantDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+}
+
 @Controller("tenants")
 export class TenantsController {
-  constructor(private readonly tenantsService: TenantsService) {}
+  constructor(private readonly tenantsService: TenantsService) { }
 
   @Get()
   list() {
     return this.tenantsService.list();
   }
 
+  @Get(":id")
+  getById(@Param("id") id: string) {
+    return this.tenantsService.findById(id);
+  }
+
   @Post()
+  @Roles("ADMIN")
   create(@Body() dto: CreateTenantDto) {
     return this.tenantsService.create(dto.name, dto.slug);
+  }
+
+  @Patch(":id")
+  @Roles("ADMIN")
+  update(@Param("id") id: string, @Body() dto: UpdateTenantDto) {
+    return this.tenantsService.update(id, dto);
   }
 }

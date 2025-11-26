@@ -5,6 +5,7 @@ import { Type } from "class-transformer";
 import { PlansService } from "./plans.service";
 import { Auth } from "../auth/auth.decorator";
 import { AuthContext } from "../auth/auth.types";
+import { Roles } from "../auth/roles.decorator";
 
 class PlanItemDto {
   @IsEnum(Platform)
@@ -49,6 +50,7 @@ export class PlansController {
   }
 
   @Post()
+  @Roles("ADMIN", "AGENCY")
   create(@Body() dto: CreatePlanDto, @Auth() auth: AuthContext) {
     return this.plansService.create(auth.tenantId, {
       strategyId: dto.strategyId,

@@ -6,10 +6,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "echo \"TODO: build shared\"",
+    "build": "tsc",
     "lint": "echo \"TODO: lint shared\"",
     "test": "echo \"TODO: test shared\""
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
 }
