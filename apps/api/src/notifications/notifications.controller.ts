@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from "class-validator";
+import { IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min } from "class-validator";
 import { NotificationChannel, NotificationType } from "@prisma/client";
 import { Transform } from "class-transformer";
 import { Auth } from "../auth/auth.decorator";
 import { AuthContext } from "../auth/auth.types";
 import { Roles } from "../auth/roles.decorator";
 import { NotificationsService } from "./notifications.service";
+import { PushService } from "./push.service";
+import { DigestService } from "./digest.service";
 
 class ListNotificationsDto {
     @IsOptional()
@@ -55,9 +57,26 @@ class UpdatePreferencesDto {
     @IsOptional() @IsString() timezone?: string;
 }
 
+class RegisterPushTokenDto {
+    @IsString()
+    token!: string;
+
+    @IsString()
+    @IsIn(["ios", "android", "web"])
+    deviceType!: string;
+
+    @IsOptional()
+    @IsString()
+    deviceName?: string;
+}
+
 @Controller("notifications")
 export class NotificationsController {
-    constructor(private readonly notificationsService: NotificationsService) {}
+    constructor(
+        private readonly notificationsService: NotificationsService,
+        private readonly pushService: PushService,
+        private readonly digestService: DigestService
+    ) {}
 
     @Get()
     async list(
@@ -120,5 +139,53 @@ export class NotificationsController {
     @Roles("ADMIN")
     async getStats(@Auth() auth: AuthContext) {
         return this.notificationsService.getStats(auth.tenantId);
+    }
+
+    // Push token endpoints
+    @Post("push-tokens")
+    async registerPushToken(
+        @Body() dto: RegisterPushTokenDto,
+        @Auth() auth: AuthContext
+    ) {
+        return this.pushService.registerToken(
+            auth.userId,
+            dto.token,
+            dto.deviceType,
+            dto.deviceName
+        );
+    }
+
+    @Delete("push-tokens/:token")
+    async unregisterPushToken(
+        @Param("token") token: string,
+        @Auth() _auth: AuthContext
+    ) {
+        await this.pushService.unregisterToken(token);
+        return { success: true };
+    }
+
+    @Get("push-tokens")
+    async listPushTokens(@Auth() auth: AuthContext) {
+        const tokens = await this.pushService.getUserTokens(auth.userId);
+        return {
+            tokens: tokens.map((t) => ({
+                id: t.id,
+                deviceType: t.deviceType,
+                deviceName: t.deviceName,
+                createdAt: t.createdAt,
+            })),
+        };
+    }
+
+    // Digest endpoints
+    @Get("digest/preview")
+    async getDigestPreview(@Auth() auth: AuthContext) {
+        return this.digestService.getDigestPreview(auth.tenantId);
+    }
+
+    @Post("digest/send")
+    @Roles("ADMIN")
+    async sendDigest(@Auth() auth: AuthContext) {
+        return this.digestService.sendDigestForTenant(auth.tenantId);
     }
 }

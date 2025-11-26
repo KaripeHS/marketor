@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { NotificationChannel, NotificationType, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "./email.service";
+import { PushService } from "./push.service";
 import { NotificationTemplatesService } from "./templates.service";
 
 export interface NotificationRecipient {
@@ -47,6 +48,7 @@ export class NotificationTriggerService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly email: EmailService,
+        private readonly push: PushService,
         private readonly templates: NotificationTemplatesService,
         private readonly config: ConfigService
     ) {
@@ -94,8 +96,7 @@ export class NotificationTriggerService {
                             }
                             break;
                         case NotificationChannel.PUSH:
-                            // Push notifications not implemented yet
-                            this.logger.debug("Push notifications not yet implemented");
+                            await this.sendPush(type, recipient, tenantId, enrichedVariables);
                             break;
                     }
                 } catch (error) {
@@ -189,6 +190,64 @@ export class NotificationTriggerService {
                 data: { failedAt: new Date(), error: result.error },
             });
             this.logger.error(`Email failed for ${recipient.email}: ${result.error}`);
+        }
+    }
+
+    private async sendPush(
+        type: NotificationType,
+        recipient: NotificationRecipient,
+        tenantId: string | undefined,
+        variables: Record<string, unknown>
+    ): Promise<void> {
+        const rendered = await this.templates.renderTemplate(type, NotificationChannel.PUSH, {
+            ...variables,
+            recipientName: recipient.name || "there",
+        });
+
+        if (!rendered) {
+            this.logger.warn(`No PUSH template for ${type}`);
+            return;
+        }
+
+        // Create notification record
+        const notification = await this.prisma.notification.create({
+            data: {
+                userId: recipient.userId,
+                tenantId,
+                type,
+                channel: NotificationChannel.PUSH,
+                title: rendered.subject || this.getTitleFromType(type),
+                body: rendered.body,
+                payload: variables as Prisma.InputJsonValue,
+            },
+        });
+
+        // Send push notification
+        const results = await this.push.sendToUser(recipient.userId, {
+            title: rendered.subject || this.getTitleFromType(type),
+            body: rendered.body,
+            data: {
+                type,
+                notificationId: notification.id,
+                ...variables,
+            },
+        });
+
+        // Update notification status based on results
+        const anySuccess = results.some((r) => r.success);
+        if (anySuccess) {
+            await this.prisma.notification.update({
+                where: { id: notification.id },
+                data: { sentAt: new Date(), deliveredAt: new Date() },
+            });
+            this.logger.debug(`Push notification sent to ${recipient.userId}: ${type}`);
+        } else {
+            const error = results[0]?.error || "Unknown error";
+            await this.prisma.notification.update({
+                where: { id: notification.id },
+                data: { failedAt: new Date(), error },
+            });
+            this.logger.error(`Push notification failed for ${recipient.userId}: ${error}`);
         }
     }
 

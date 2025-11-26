@@ -3,6 +3,8 @@ import { ConfigModule } from "@nestjs/config";
 import { NotificationsService } from "./notifications.service";
 import { NotificationsController } from "./notifications.controller";
 import { EmailService } from "./email.service";
+import { PushService } from "./push.service";
+import { DigestService } from "./digest.service";
 import { NotificationTemplatesService } from "./templates.service";
 import { NotificationTriggerService } from "./notification-trigger.service";
 
@@ -11,6 +13,8 @@ import { NotificationTriggerService } from "./notification-trigger.service";
     providers: [
         NotificationsService,
         EmailService,
+        PushService,
+        DigestService,
         NotificationTemplatesService,
         NotificationTriggerService,
     ],
@@ -18,6 +22,8 @@ import { NotificationTriggerService } from "./notification-trigger.service";
     exports: [
         NotificationsService,
         EmailService,
+        PushService,
+        DigestService,
         NotificationTriggerService,
     ],
 })
