@@ -70,13 +70,14 @@ async function main() {
 
     console.log(`✅ Created FREE subscription for ${tenant.name}`);
 
-    // Create plan definitions
+    // Create plan definitions (prices in cents)
     const plans = [
         {
             plan: PlanType.FREE,
             name: "Free",
-            monthlyPrice: 0,
-            yearlyPrice: 0,
+            description: "Get started with basic features",
+            priceMonthly: 0,
+            priceYearly: 0,
             maxUsers: 2,
             maxPosts: 30,
             maxStorage: 500,
@@ -86,8 +87,9 @@ async function main() {
         {
             plan: PlanType.STARTER,
             name: "Starter",
-            monthlyPrice: 29,
-            yearlyPrice: 290,
+            description: "For growing creators",
+            priceMonthly: 2900, // $29
+            priceYearly: 29000, // $290
             maxUsers: 5,
             maxPosts: 100,
             maxStorage: 2000,
@@ -97,8 +99,9 @@ async function main() {
         {
             plan: PlanType.PROFESSIONAL,
             name: "Professional",
-            monthlyPrice: 79,
-            yearlyPrice: 790,
+            description: "For serious marketers",
+            priceMonthly: 7900, // $79
+            priceYearly: 79000, // $790
             maxUsers: 15,
             maxPosts: 500,
             maxStorage: 10000,
@@ -108,8 +111,9 @@ async function main() {
         {
             plan: PlanType.AGENCY,
             name: "Agency",
-            monthlyPrice: 199,
-            yearlyPrice: 1990,
+            description: "For agencies and teams",
+            priceMonthly: 19900, // $199
+            priceYearly: 199000, // $1990
             maxUsers: 50,
             maxPosts: 2000,
             maxStorage: 50000,
