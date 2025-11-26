@@ -28,6 +28,7 @@ import { ComplianceModule } from "./compliance/compliance.module";
 import { BillingModule } from "./billing/billing.module";
 import { MetricsModule } from "./metrics/metrics.module";
 import { CacheModule } from "./cache/cache.module";
+import { WebsocketModule } from "./websocket/websocket.module";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthGuard } from "./auth/auth.guard";
 import { RolesGuard } from "./auth/roles.guard";
@@ -62,6 +63,7 @@ import { AuditInterceptor } from "./audit/audit.interceptor";
     RateLimitModule,
     ComplianceModule,
     BillingModule,
+    WebsocketModule,
   ],
   controllers: [AppController],
   providers: [
