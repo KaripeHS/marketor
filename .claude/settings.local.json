@@ -10,7 +10,14 @@
       "Bash(npm run lint:*)",
       "Bash(npm test:*)",
       "Bash(npm run build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: complete platform implementation with billing, notifications, and security\n\nMajor additions:\n- Billing/Entitlements: Stripe integration with checkout, portal, webhooks, usage tracking\n- Notifications: Email service with Resend, templating, user preferences, multi-channel\n- Analytics: Metrics ingestion, aggregation, learning insights\n- AI: Content generation, orchestrator, prompt registry\n- Security: Helmet headers, CORS config, rate limiting, encryption\n- Social: OAuth flows for Twitter, Instagram, Facebook, LinkedIn, TikTok\n- Media: S3 uploads, image processing\n- Queue: BullMQ job processing, scheduled tasks\n- Compliance: Content moderation, GDPR tools\n- Tests: Jest unit tests for core services\n- CI: GitHub Actions workflow\n\nAlso includes:\n- OWNER-HANDOFF.md with all required environment variables\n- Updated Prisma schema with all models\n- Web app pages and components\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(vercel --version:*)",
+      "Bash(vercel:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(npx ts-node:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
