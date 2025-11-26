@@ -4,8 +4,10 @@ import Redis from "ioredis";
 import { PrismaService } from "../prisma/prisma.service";
 import { CryptoService } from "../crypto/crypto.service";
 import { RateLimitService } from "../ratelimit/ratelimit.service";
-import { PostJobStatus, Platform } from "@prisma/client";
+import { PostJobStatus, Platform, ContentItem } from "@prisma/client";
 import { PostJobData, JobResult } from "./queue.service";
+import { PublisherService } from "../social/publishers/publisher.service";
+import { PublishContent } from "../social/publishers/publisher.interface";
 
 @Injectable()
 export class PostJobProcessor implements OnModuleInit {
@@ -16,7 +18,8 @@ export class PostJobProcessor implements OnModuleInit {
     constructor(
         private readonly prisma: PrismaService,
         private readonly crypto: CryptoService,
-        private readonly rateLimit: RateLimitService
+        private readonly rateLimit: RateLimitService,
+        private readonly publisherService: PublisherService
     ) {}
 
     async onModuleInit() {
@@ -197,71 +200,51 @@ export class PostJobProcessor implements OnModuleInit {
 
     private async publishToPlatform(
         platform: Platform,
-        _connection: { accessToken: string; accountId: string },
-        content: { id: string; caption?: string | null; mediaUrl?: string | null; title?: string | null }
+        connection: { accessToken: string; refreshToken?: string | null; accountId: string; accountName?: string | null },
+        content: ContentItem
     ): Promise<{ platformPostId: string; platformUrl: string }> {
-        // In production, this would call actual platform APIs using _connection.accessToken
-        // For now, return mock responses
-
-        switch (platform) {
-            case "TIKTOK":
-                return this.mockTikTokPublish(content);
-            case "INSTAGRAM":
-                return this.mockInstagramPublish(content);
-            case "YOUTUBE":
-            case "YOUTUBE_SHORT":
-                return this.mockYouTubePublish(platform, content);
-            case "FACEBOOK":
-                return this.mockFacebookPublish(content);
-            default:
-                throw new Error(`Unsupported platform: ${platform}`);
+        // Check if platform is supported
+        if (!this.publisherService.isSupported(platform)) {
+            throw new Error(`Unsupported platform: ${platform}`);
         }
-    }
 
-    private async mockTikTokPublish(content: { id: string }): Promise<{ platformPostId: string; platformUrl: string }> {
-        // Simulate API call delay
-        await this.delay(1000);
-        const postId = `tiktok_${Date.now()}_${content.id.slice(-6)}`;
-        return {
-            platformPostId: postId,
-            platformUrl: `https://www.tiktok.com/@account/video/${postId}`,
+        // Map ContentItem to PublishContent
+        const publishContent: PublishContent = {
+            id: content.id,
+            caption: content.caption,
+            title: content.title,
+            script: content.script,
+            mediaUrl: content.mediaUrl,
+            format: content.format,
+            thumbnailUrl: content.thumbnailUrl,
+            hashtags: content.hashtags || [],
         };
-    }
 
-    private async mockInstagramPublish(content: { id: string }): Promise<{ platformPostId: string; platformUrl: string }> {
-        await this.delay(1000);
-        const postId = `ig_${Date.now()}_${content.id.slice(-6)}`;
+        // Validate content before publishing
+        const validation = this.publisherService.validateContent(platform, publishContent);
+        if (!validation.valid) {
+            throw new Error(`Content validation failed: ${validation.errors.join("; ")}`);
+        }
+
+        // Publish using the appropriate platform publisher
+        const result = await this.publisherService.publish(
+            platform,
+            {
+                accessToken: connection.accessToken,
+                refreshToken: connection.refreshToken,
+                accountId: connection.accountId,
+                accountName: connection.accountName,
+            },
+            publishContent
+        );
+
+        if (!result.success) {
+            throw new Error(result.error || "Publishing failed");
+        }
+
         return {
-            platformPostId: postId,
-            platformUrl: `https://www.instagram.com/p/${postId}/`,
+            platformPostId: result.platformPostId!,
+            platformUrl: result.platformUrl!,
         };
-    }
-
-    private async mockYouTubePublish(
-        platform: Platform,
-        content: { id: string }
-    ): Promise<{ platformPostId: string; platformUrl: string }> {
-        await this.delay(1500);
-        const videoId = `yt_${content.id.slice(-11)}`;
-        const isShort = platform === "YOUTUBE_SHORT";
-        return {
-            platformPostId: videoId,
-            platformUrl: isShort
-                ? `https://www.youtube.com/shorts/${videoId}`
-                : `https://www.youtube.com/watch?v=${videoId}`,
-        };
-    }
-
-    private async mockFacebookPublish(content: { id: string }): Promise<{ platformPostId: string; platformUrl: string }> {
-        await this.delay(800);
-        const postId = `fb_${Date.now()}_${content.id.slice(-6)}`;
-        return {
-            platformPostId: postId,
-            platformUrl: `https://www.facebook.com/watch/?v=${postId}`,
-        };
-    }
-
-    private delay(ms: number): Promise<void> {
-        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 }
