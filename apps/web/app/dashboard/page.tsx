@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
+import GettingStartedWizard from "@/components/dashboard/GettingStartedWizard";
 import { useAuth } from "@/contexts/AuthContext";
 import { campaignsService, contentService, analyticsService } from "@/services/api";
 import { Campaign, ContentItem, AnalyticsData, ContentState } from "@/types";
@@ -91,6 +92,9 @@ export default function DashboardPage() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
+                {/* Getting Started Wizard */}
+                <GettingStartedWizard />
+
                 {/* Header */}
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">

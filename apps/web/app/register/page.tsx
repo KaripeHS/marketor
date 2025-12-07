@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
+    const router = useRouter();
     const { register } = useAuth();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -32,6 +34,7 @@ export default function RegisterPage() {
         try {
             await register(email, password, name || undefined);
             toast.success("Account created successfully!");
+            router.push("/onboarding");
         } catch (error: any) {
             console.error("Registration failed", error);
             toast.error(error.response?.data?.message || "Failed to create account");
