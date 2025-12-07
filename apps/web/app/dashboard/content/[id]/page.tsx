@@ -6,9 +6,10 @@ import Link from "next/link";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { contentService, approvalsService, commentsService } from "@/services/api";
 import { ContentItem, Approval, Comment, ApprovalStatus, ContentState, UpdateContentDto, MediaAsset } from "@/types";
-import { Loader2, CheckCircle, XCircle, AlertCircle, Send, Save, ArrowLeft, Edit2, Image as ImageIcon, Hash, Eye } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, AlertCircle, Send, Save, ArrowLeft, Edit2, Image as ImageIcon, Hash, Eye, Share2 } from "lucide-react";
 import MediaUploader from "@/components/media/MediaUploader";
 import { PlatformPreviewSelector } from "@/components/content/PlatformPreview";
+import PublishModal from "@/components/content/PublishModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ export default function ContentDetailPage() {
     const [submittingComment, setSubmittingComment] = useState(false);
     const [processingApproval, setProcessingApproval] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [showPublishModal, setShowPublishModal] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -220,6 +222,14 @@ export default function ContentDetailPage() {
                         >
                             <Eye className="w-4 h-4 mr-2" />
                             Preview
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowPublishModal(true)}
+                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+                        >
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Publish
                         </button>
                         {isEditing ? (
                             <>
@@ -575,6 +585,16 @@ export default function ContentDetailPage() {
                         </form>
                     </div>
                 </div>
+
+                {/* Publish Modal */}
+                <PublishModal
+                    isOpen={showPublishModal}
+                    onClose={() => setShowPublishModal(false)}
+                    content={content}
+                    onPublished={() => {
+                        fetchData();
+                    }}
+                />
             </div>
         </DashboardLayout>
     );
