@@ -28,6 +28,7 @@ import {
     CreateInvitationDto,
     MediaAsset,
     MediaType,
+    Platform,
 } from "@/types";
 
 export const campaignsService = {
@@ -310,6 +311,33 @@ export const socialConnectionsService = {
 
     refresh: async (id: string) => {
         const response = await api.post<SocialConnection>(`/social/connections/${id}/refresh`);
+        return response.data;
+    }
+};
+
+// OAuth service for initiating social platform connections
+export interface OAuthPlatformInfo {
+    platform: Platform;
+    configured: boolean;
+    displayName: string;
+}
+
+export const oauthService = {
+    // Get available OAuth platforms
+    getPlatforms: async (): Promise<OAuthPlatformInfo[]> => {
+        const response = await api.get<OAuthPlatformInfo[]>("/social/oauth/platforms");
+        return response.data;
+    },
+
+    // Get OAuth authorization URL for a platform
+    getAuthorizationUrl: (platform: Platform): string => {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        return `${baseUrl}/social/oauth/${platform.toLowerCase()}/authorize`;
+    },
+
+    // Refresh token for a connection
+    refreshToken: async (connectionId: string) => {
+        const response = await api.get(`/social/oauth/refresh/${connectionId}`);
         return response.data;
     }
 };

@@ -10,6 +10,9 @@ export enum Platform {
     YOUTUBE = "YOUTUBE",
     YOUTUBE_SHORT = "YOUTUBE_SHORT",
     FACEBOOK = "FACEBOOK",
+    TWITTER = "TWITTER",
+    LINKEDIN = "LINKEDIN",
+    PINTEREST = "PINTEREST",
 }
 
 export enum ContentFormat {
