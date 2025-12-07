@@ -19,7 +19,20 @@
       "Bash(npx ts-node:*)",
       "Bash(git commit:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_sd4pfnV8IBZm@ep-curly-haze-a4leofht-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx ts-node:*)",
-      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_sd4pfnV8IBZm@ep-curly-haze-a4leofht-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx prisma db push:*)"
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_sd4pfnV8IBZm@ep-curly-haze-a4leofht-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx prisma db push:*)",
+      "Bash(npm run test)",
+      "Bash(npm run test:*)",
+      "Bash(tasklist:*)",
+      "Bash(npm ls:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npx prisma validate:*)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_sd4pfnV8IBZm@ep-curly-haze-a4leofht-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require\" npx prisma validate:*)",
+      "Bash(git checkout:*)",
+      "Bash(cat:*)",
+      "Bash(powershell -Command \"(Get-Content app/admin/tenants/page.tsx) -replace ''    MoreVertical,\\r?\\n'', '''' | Set-Content app/admin/tenants/page.tsx\")",
+      "Bash(node:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

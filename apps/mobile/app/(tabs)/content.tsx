@@ -9,6 +9,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { contentApi, ContentItem } from "@/services/api";
 import { Colors, ContentStates, Platforms } from "@/constants/config";
 
@@ -56,7 +57,10 @@ export default function ContentScreen() {
         const platformInfo = Platforms[item.platform as keyof typeof Platforms];
 
         return (
-            <TouchableOpacity style={styles.card}>
+            <TouchableOpacity
+                style={styles.card}
+                onPress={() => router.push(`/content/${item.id}`)}
+            >
                 <View style={styles.cardHeader}>
                     <View style={styles.platformBadge}>
                         {platformInfo && (

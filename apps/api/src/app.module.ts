@@ -29,6 +29,8 @@ import { BillingModule } from "./billing/billing.module";
 import { MetricsModule } from "./metrics/metrics.module";
 import { CacheModule } from "./cache/cache.module";
 import { WebsocketModule } from "./websocket/websocket.module";
+import { AdminModule } from "./admin/admin.module";
+import { ThrottleModule } from "./throttle/throttle.module";
 import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthGuard } from "./auth/auth.guard";
 import { RolesGuard } from "./auth/roles.guard";
@@ -40,6 +42,7 @@ import { AuditInterceptor } from "./audit/audit.interceptor";
     SentryModule,
     MetricsModule,
     CacheModule,
+    ThrottleModule,
     TenantsModule,
     CampaignsModule,
     ContentModule,
@@ -64,6 +67,7 @@ import { AuditInterceptor } from "./audit/audit.interceptor";
     ComplianceModule,
     BillingModule,
     WebsocketModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

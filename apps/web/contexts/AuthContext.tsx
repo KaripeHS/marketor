@@ -21,6 +21,7 @@ interface AuthContextType {
     tenantId: string | null;
     currentUser: User | null;
     currentTenant: Tenant | null;
+    currentMembership: TenantMembership | null;
     memberships: TenantMembership[];
     token: string | null;
     login: (email: string, password: string, redirectTo?: string) => Promise<void>;
@@ -158,6 +159,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const currentMembership = tenantId
+        ? memberships.find(m => m.tenantId === tenantId) || null
+        : null;
+
     return (
         <AuthContext.Provider
             value={{
@@ -165,6 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 tenantId,
                 currentUser,
                 currentTenant,
+                currentMembership,
                 memberships,
                 token,
                 login,

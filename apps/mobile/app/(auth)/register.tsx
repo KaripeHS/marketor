@@ -67,6 +67,7 @@ export default function RegisterScreen() {
                             value={name}
                             onChangeText={setName}
                             autoComplete="name"
+                            testID="register-name-input"
                         />
                     </View>
 
@@ -81,6 +82,7 @@ export default function RegisterScreen() {
                             autoCapitalize="none"
                             keyboardType="email-address"
                             autoComplete="email"
+                            testID="register-email-input"
                         />
                     </View>
 
@@ -94,6 +96,7 @@ export default function RegisterScreen() {
                             onChangeText={setPassword}
                             secureTextEntry
                             autoComplete="new-password"
+                            testID="register-password-input"
                         />
                     </View>
 
@@ -101,6 +104,7 @@ export default function RegisterScreen() {
                         style={[styles.button, loading && styles.buttonDisabled]}
                         onPress={handleRegister}
                         disabled={loading}
+                        testID="register-submit-button"
                     >
                         {loading ? (
                             <ActivityIndicator color="#fff" />

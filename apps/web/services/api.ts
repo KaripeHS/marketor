@@ -443,3 +443,66 @@ export const mediaService = {
         await api.delete(`/media/${id}`, { params: { tenantId } });
     }
 };
+
+// Admin Service
+
+export const adminService = {
+    getHealth: async () => {
+        const response = await api.get<any>("/admin/health");
+        return response.data;
+    },
+
+    getStats: async () => {
+        const response = await api.get<any>("/admin/stats");
+        return response.data;
+    },
+
+    getTenants: async (page: number = 1, limit: number = 20) => {
+        const response = await api.get<any>("/admin/tenants", { params: { page, limit } });
+        return response.data;
+    },
+
+    getUsers: async (page: number = 1, limit: number = 20) => {
+        const response = await api.get<any>("/admin/users", { params: { page, limit } });
+        return response.data;
+    },
+
+    getAuditLogs: async (page: number = 1, limit: number = 50, filters?: {
+        userId?: string;
+        action?: string;
+        resource?: string;
+        startDate?: string;
+        endDate?: string;
+    }) => {
+        const response = await api.get<any>("/admin/audit-logs", {
+            params: { page, limit, ...filters }
+        });
+        return response.data;
+    },
+
+    getUsageMetrics: async (tenantId?: string) => {
+        const params = tenantId ? { tenantId } : {};
+        const response = await api.get<any>("/admin/usage", { params });
+        return response.data;
+    },
+
+    suspendTenant: async (tenantId: string, reason: string) => {
+        const response = await api.post<any>(`/admin/tenants/${tenantId}/suspend`, { reason });
+        return response.data;
+    },
+
+    unsuspendTenant: async (tenantId: string) => {
+        const response = await api.post<any>(`/admin/tenants/${tenantId}/unsuspend`);
+        return response.data;
+    },
+
+    deleteUser: async (userId: string) => {
+        const response = await api.delete<any>(`/admin/users/${userId}`);
+        return response.data;
+    },
+
+    impersonateUser: async (userId: string) => {
+        const response = await api.post<any>(`/admin/users/${userId}/impersonate`);
+        return response.data;
+    }
+};

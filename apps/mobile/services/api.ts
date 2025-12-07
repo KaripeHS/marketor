@@ -185,6 +185,111 @@ export const campaignsApi = {
         const response = await api.get<Campaign>(`/campaigns/${id}`);
         return response.data;
     },
+
+    create: async (data: { name: string }) => {
+        const response = await api.post<Campaign>("/campaigns", data);
+        return response.data;
+    },
+};
+
+export interface AnalyticsOverview {
+    metrics: {
+        totalViews: number;
+        totalLikes: number;
+        totalComments: number;
+        totalShares: number;
+        followersGained: number;
+        engagementRate: number;
+    };
+    trend: {
+        views: number;
+        likes: number;
+        engagement: number;
+    };
+}
+
+export interface PlatformMetrics {
+    platform: string;
+    views: number;
+    likes: number;
+    comments: number;
+    shares: number;
+    engagementRate: number;
+}
+
+export const analyticsApi = {
+    getOverview: async (period: string = "30d"): Promise<AnalyticsOverview> => {
+        const response = await api.get<AnalyticsOverview>("/analytics/overview", {
+            params: { period },
+        });
+        return response.data;
+    },
+
+    getPlatforms: async (period: string = "30d"): Promise<PlatformMetrics[]> => {
+        const response = await api.get<PlatformMetrics[]>("/analytics/platforms", {
+            params: { period },
+        });
+        return response.data;
+    },
+
+    getTopContent: async (period: string = "30d") => {
+        const response = await api.get("/analytics/top-content", {
+            params: { period, limit: 10 },
+        });
+        return response.data;
+    },
+};
+
+export interface BrandProfile {
+    id: string;
+    name: string;
+    description: string | null;
+    voiceTone: string | null;
+    targetAudience: string | null;
+    logoUrl: string | null;
+}
+
+export const brandApi = {
+    get: async (): Promise<BrandProfile | null> => {
+        try {
+            const response = await api.get<BrandProfile>("/brand");
+            return response.data;
+        } catch {
+            return null;
+        }
+    },
+
+    create: async (data: Partial<BrandProfile>) => {
+        const response = await api.post<BrandProfile>("/brand", data);
+        return response.data;
+    },
+};
+
+export interface Strategy {
+    id: string;
+    name: string;
+    goals: string[];
+    platforms: string[];
+    postingFrequency: Record<string, number>;
+    contentPillars: string[];
+    createdAt: string;
+}
+
+export const strategyApi = {
+    list: async () => {
+        const response = await api.get<Strategy[]>("/strategy");
+        return response.data;
+    },
+
+    get: async (id: string) => {
+        const response = await api.get<Strategy>(`/strategy/${id}`);
+        return response.data;
+    },
+
+    create: async (data: Partial<Strategy>) => {
+        const response = await api.post<Strategy>("/strategy", data);
+        return response.data;
+    },
 };
 
 export default api;

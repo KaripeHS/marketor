@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { IsEmail, IsOptional, IsString, MinLength } from "class-validator";
 import { Auth } from "./auth.decorator";
 import { AuthContext } from "./auth.types";
@@ -38,18 +39,22 @@ export class AuthController {
 
     @Public()
     @Post("register")
+    @Throttle({ short: { limit: 5, ttl: 60000 } }) // 5 registrations per minute per IP
     @ApiOperation({ summary: "Register a new user" })
     @ApiResponse({ status: 201, description: "User created successfully" })
     @ApiResponse({ status: 400, description: "Invalid input or email already exists" })
+    @ApiResponse({ status: 429, description: "Too many registration attempts" })
     async register(@Body() dto: RegisterDto) {
         return this.authService.register(dto.email, dto.password, dto.name);
     }
 
     @Public()
     @Post("login")
+    @Throttle({ short: { limit: 10, ttl: 60000 } }) // 10 login attempts per minute per IP (brute force protection)
     @ApiOperation({ summary: "Login with email and password" })
     @ApiResponse({ status: 200, description: "Returns JWT tokens" })
     @ApiResponse({ status: 401, description: "Invalid credentials" })
+    @ApiResponse({ status: 429, description: "Too many login attempts" })
     async login(@Body() dto: LoginDto) {
         return this.authService.login(dto.email, dto.password);
     }

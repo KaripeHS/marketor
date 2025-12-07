@@ -52,6 +52,9 @@ model UserTenantRole {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, tenantId])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([role])
 }
 
 enum Role {
@@ -70,6 +73,10 @@ model Campaign {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   content     ContentItem[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 enum CampaignStatus {
@@ -100,6 +107,14 @@ model ContentItem {
   comments       Comment[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
+
+  @@index([tenantId])
+  @@index([campaignId])
+  @@index([platform])
+  @@index([state])
+  @@index([scheduledFor])
+  @@index([publishedAt])
+  @@index([createdAt])
 }
 
 enum Platform {
@@ -142,6 +157,9 @@ model Approval {
   complianceId String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+
+  @@index([status])
+  @@index([reviewerId])
 }
 
 enum ApprovalStatus {
@@ -160,6 +178,10 @@ model RevisionRequest {
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([contentId])
+  @@index([status])
+  @@index([requestedBy])
 }
 
 enum RevisionStatus {
@@ -177,6 +199,9 @@ model Comment {
   isInternal Boolean     @default(false)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+
+  @@index([contentId])
+  @@index([authorId])
 }
 
 model Notification {
@@ -287,6 +312,12 @@ model AuditLog {
   targetId   String?
   meta       Json?
   createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([tenantId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
 }
 
 model BrandProfile {
@@ -302,6 +333,7 @@ model BrandProfile {
   updatedAt   DateTime @updatedAt
 
   @@unique([tenantId, name])
+  @@index([tenantId])
 }
 
 model TrendMap {
@@ -311,6 +343,9 @@ model TrendMap {
   generatedAt DateTime @default(now())
   data       Json
   createdAt  DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([generatedAt])
 }
 
 model Strategy {
@@ -326,6 +361,10 @@ model Strategy {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   plans      ContentPlan[]
+
+  @@index([tenantId])
+  @@index([startsOn])
+  @@index([endsOn])
 }
 
 model ContentPlan {
@@ -338,6 +377,9 @@ model ContentPlan {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   items      ContentPlanItem[]
+
+  @@index([tenantId])
+  @@index([strategyId])
 }
 
 model ContentPlanItem {
@@ -351,6 +393,11 @@ model ContentPlanItem {
   topicSlug   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([planId])
+  @@index([contentId])
+  @@index([platform])
+  @@index([scheduledAt])
 }
 
 model PromptVersion {
@@ -363,6 +410,7 @@ model PromptVersion {
   updatedAt    DateTime @updatedAt
 
   @@unique([agent, version])
+  @@index([agent])
 }
 
 // Social Integration Models
@@ -385,6 +433,10 @@ model SocialConnection {
   updatedAt     DateTime @updatedAt
 
   @@unique([tenantId, platform, accountId])
+  @@index([tenantId])
+  @@index([platform])
+  @@index([isActive])
+  @@index([tokenExpiry])
 }
 
 model PostJob {
@@ -403,6 +455,9 @@ model PostJob {
   updatedAt     DateTime   @updatedAt
 
   @@index([status, scheduledFor])
+  @@index([tenantId])
+  @@index([contentId])
+  @@index([platform])
 }
 
 enum PostJobStatus {
@@ -423,6 +478,10 @@ model PublishResult {
   publishedAt     DateTime
   meta            Json?
   createdAt       DateTime @default(now())
+
+  @@index([platform])
+  @@index([publishedAt])
+  @@index([platformPostId])
 }
 
 model ComplianceRule {
@@ -435,6 +494,8 @@ model ComplianceRule {
   updatedAt   DateTime @updatedAt
 
   @@unique([ruleset, ruleId])
+  @@index([ruleset])
+  @@index([severity])
 }
 
 // Invitation Model

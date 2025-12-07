@@ -31,9 +31,11 @@ export const Platforms = {
     TIKTOK: { name: "TikTok", icon: "logo-tiktok", color: "#000000" },
     INSTAGRAM: { name: "Instagram", icon: "logo-instagram", color: "#E4405F" },
     YOUTUBE: { name: "YouTube", icon: "logo-youtube", color: "#FF0000" },
+    YOUTUBE_SHORT: { name: "YouTube Shorts", icon: "logo-youtube", color: "#FF0000" },
     TWITTER: { name: "Twitter/X", icon: "logo-twitter", color: "#1DA1F2" },
     FACEBOOK: { name: "Facebook", icon: "logo-facebook", color: "#1877F2" },
     LINKEDIN: { name: "LinkedIn", icon: "logo-linkedin", color: "#0A66C2" },
+    PINTEREST: { name: "Pinterest", icon: "logo-pinterest", color: "#E60023" },
 };
 
 export const ContentStates = {
