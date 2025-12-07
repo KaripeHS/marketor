@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, Megaphone, Settings, LogOut, BarChart3, FileText, Palette, Target, ClipboardList, GitBranch, History, Bell, Menu, X, Share2, Users } from "lucide-react";
+import { LayoutDashboard, Calendar, Megaphone, Settings, LogOut, BarChart3, FileText, Palette, Target, ClipboardList, GitBranch, History, Bell, Menu, X, Share2, Users, Sparkles, CreditCard } from "lucide-react";
 import { useState } from "react";
 import NotificationCenter from "../notifications/NotificationCenter";
 import TenantSwitcher from "../TenantSwitcher";
@@ -26,7 +26,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Team", href: "/dashboard/team", icon: Users },
         { name: "Revisions", href: "/dashboard/revisions", icon: GitBranch },
         { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+        { name: "AI Assistant", href: "/dashboard/ai", icon: Sparkles },
         { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+        { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
         { name: "Audit Log", href: "/dashboard/audit", icon: History },
         { name: "Settings", href: "/dashboard/settings", icon: Settings },
     ];

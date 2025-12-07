@@ -189,12 +189,7 @@ export const revisionsService = {
     }
 };
 
-export const aiService = {
-    generate: async (type: "STRATEGY" | "CONTENT", context: Record<string, any>, prompt?: string) => {
-        const response = await api.post<any>("/ai/generate", { type, context, prompt });
-        return response.data;
-    }
-};
+
 
 export const analyticsService = {
     getOverview: async (period: string = "30d") => {
@@ -505,4 +500,166 @@ export const adminService = {
         const response = await api.post<any>(`/admin/users/${userId}/impersonate`);
         return response.data;
     }
+};
+
+// Billing Service
+
+export interface Plan {
+    id: string;
+    name: string;
+    priceId: string;
+    price: number;
+    interval: "month" | "year";
+    features: string[];
+    limits: {
+        posts: number;
+        storage: number;
+        aiGenerations: number;
+        teamMembers: number;
+        socialConnections: number;
+    };
+    popular?: boolean;
+}
+
+export interface Subscription {
+    id: string;
+    status: "active" | "trialing" | "past_due" | "canceled" | "incomplete";
+    planId: string;
+    planName: string;
+    currentPeriodStart: string;
+    currentPeriodEnd: string;
+    cancelAtPeriodEnd: boolean;
+    trialEnd?: string;
+}
+
+export interface Usage {
+    posts: { used: number; limit: number; percentage: number };
+    storage: { used: number; limit: number; percentage: number };
+    aiGenerations: { used: number; limit: number; percentage: number };
+    teamMembers: { used: number; limit: number; percentage: number };
+    socialConnections: { used: number; limit: number; percentage: number };
+}
+
+export interface Invoice {
+    id: string;
+    number: string;
+    status: string;
+    amount: number;
+    currency: string;
+    created: string;
+    hostedInvoiceUrl?: string;
+    pdfUrl?: string;
+}
+
+export const billingService = {
+    getPlans: async (): Promise<Plan[]> => {
+        const response = await api.get<Plan[]>("/billing/plans");
+        return response.data;
+    },
+
+    getSubscription: async (): Promise<Subscription | null> => {
+        const response = await api.get<Subscription | null>("/billing/subscription");
+        return response.data;
+    },
+
+    createCheckout: async (priceId: string, successUrl: string, cancelUrl: string, trialDays?: number) => {
+        const response = await api.post<{ url: string }>("/billing/checkout", {
+            priceId,
+            successUrl,
+            cancelUrl,
+            trialDays,
+        });
+        return response.data;
+    },
+
+    createPortal: async (returnUrl: string) => {
+        const response = await api.post<{ url: string }>("/billing/portal", { returnUrl });
+        return response.data;
+    },
+
+    cancelSubscription: async (immediate: boolean = false) => {
+        const response = await api.post<{ success: boolean }>(`/billing/cancel?immediate=${immediate}`);
+        return response.data;
+    },
+
+    resumeSubscription: async () => {
+        const response = await api.post<{ success: boolean }>("/billing/resume");
+        return response.data;
+    },
+
+    getUsage: async (): Promise<Usage> => {
+        const response = await api.get<Usage>("/billing/usage");
+        return response.data;
+    },
+
+    getUsageHistory: async (months: number = 6) => {
+        const response = await api.get<any[]>("/billing/usage/history", { params: { months } });
+        return response.data;
+    },
+
+    getEntitlements: async () => {
+        const response = await api.get<any>("/billing/entitlements");
+        return response.data;
+    },
+
+    getInvoices: async (limit: number = 10): Promise<Invoice[]> => {
+        const response = await api.get<Invoice[]>("/billing/invoices", { params: { limit } });
+        return response.data;
+    },
+};
+
+// AI Service
+
+export type AgentType =
+    | "INGESTION"
+    | "TREND_RESEARCH"
+    | "STRATEGY"
+    | "PLANNER"
+    | "SCRIPT_WRITER"
+    | "CAPTION_WRITER"
+    | "IMAGE_GENERATOR"
+    | "VIDEO_GENERATOR"
+    | "COMPLIANCE"
+    | "SCHEDULER"
+    | "ANALYTICS"
+    | "LEARNING"
+    | "REPORTING";
+
+export interface AIGenerationResult {
+    success: boolean;
+    content?: string;
+    data?: any;
+    error?: string;
+    tokensUsed?: number;
+}
+
+export const aiService = {
+    generate: async (type: "STRATEGY" | "CONTENT", context: Record<string, any>, prompt?: string): Promise<AIGenerationResult> => {
+        const response = await api.post<AIGenerationResult>("/ai/generate", { type, context, prompt });
+        return response.data;
+    },
+
+    executeAgent: async (
+        agentType: AgentType,
+        variables: Record<string, unknown>,
+        options?: { promptVersion?: string; retryCount?: number }
+    ): Promise<AIGenerationResult> => {
+        const response = await api.post<AIGenerationResult>("/ai/agents/execute", {
+            agentType,
+            variables,
+            ...options,
+        });
+        return response.data;
+    },
+
+    getAgentTypes: async () => {
+        const response = await api.get<{ types: AgentType[]; descriptions: Record<AgentType, string> }>("/ai/agents/types");
+        return response.data;
+    },
+
+    getPrompts: async (agentType?: AgentType) => {
+        const params = agentType ? { agentType } : {};
+        const response = await api.get<any[]>("/ai/prompts", { params });
+        return response.data;
+    },
 };

@@ -76,10 +76,10 @@ export default function StrategyPage() {
         setGenerating(true);
         try {
             const result = await aiService.generate("STRATEGY", { name });
-            if (result) {
-                if (result.goals) setGoals(JSON.stringify(result.goals, null, 2));
-                if (result.pillars) setPillars(JSON.stringify(result.pillars, null, 2));
-                if (result.platformFocus) setPlatformFocus(JSON.stringify(result.platformFocus, null, 2));
+            if (result && result.data) {
+                if (result.data.goals) setGoals(JSON.stringify(result.data.goals, null, 2));
+                if (result.data.pillars) setPillars(JSON.stringify(result.data.pillars, null, 2));
+                if (result.data.platformFocus) setPlatformFocus(JSON.stringify(result.data.platformFocus, null, 2));
                 toast.success("Strategy generated!");
             }
         } catch (error) {

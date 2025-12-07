@@ -32,7 +32,8 @@
       "Bash(cat:*)",
       "Bash(powershell -Command \"(Get-Content app/admin/tenants/page.tsx) -replace ''    MoreVertical,\\r?\\n'', '''' | Set-Content app/admin/tenants/page.tsx\")",
       "Bash(node:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []

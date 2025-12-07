@@ -134,8 +134,8 @@ export default function ContentPage() {
                 recentContent: contentItems.slice(0, 5).map(c => ({ platform: c.platform, format: c.format }))
             };
             const result = await aiService.generate("CONTENT", context);
-            if (result && result.ideas) {
-                setAiIdeas(result.ideas);
+            if (result && result.data?.ideas) {
+                setAiIdeas(result.data.ideas);
                 toast.success("Ideas generated!");
             }
         } catch (error) {

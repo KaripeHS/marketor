@@ -77,8 +77,8 @@ export default function CampaignDetailPage() {
                 context.audiences = brandProfile.audiences;
             }
             const result = await aiService.generate("CONTENT", context, "Generate 3-4 fresh content ideas for this campaign");
-            if (result.ideas && Array.isArray(result.ideas)) {
-                setAiIdeas(result.ideas);
+            if (result.data?.ideas && Array.isArray(result.data.ideas)) {
+                setAiIdeas(result.data.ideas);
             }
         } catch (error) {
             console.error("Failed to generate AI ideas", error);
