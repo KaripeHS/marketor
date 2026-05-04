@@ -1,14 +1,37 @@
 name: CI
 
+# Cost-control hardening: concurrency cancel, paths-ignore for docs,
+# per-job timeouts, draft-skip on PR triggers. See KaripeHS/unitedvows
+# .github/workflows/README.md for the canonical "Required Protections"
+# documentation.
+
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.gitignore'
+      - 'LICENSE'
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.gitignore'
+      - 'LICENSE'
+
+# Cancel any in-flight CI run when a new commit lands on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -38,11 +61,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-  # Separate job for database migrations (only on main)
+  # Separate job for database migrations (only on main).
+  # Already gated to push-to-main; no draft-skip needed because pushes
+  # don't have a draft state.
   db-push:
     runs-on: ubuntu-latest
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    timeout-minutes: 5
 
     steps:
       - name: Checkout code
