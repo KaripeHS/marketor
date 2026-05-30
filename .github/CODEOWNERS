@@ -1,0 +1,8 @@
+# CODEOWNERS — defense-in-depth on workflow files.
+# Any PR that modifies .github/workflows/** requires explicit approval from @karipehs.
+# This is the "Review from Code Owners" gate, intentionally narrow to only the highest-risk path.
+#
+# Generated 2026-05-29 as part of cross-repo GitHub config rollout (UV-equivalent setup).
+# Companion to branch protection rules; both must be active for full defense.
+
+.github/workflows/** @karipehs
